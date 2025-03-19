@@ -12,3 +12,7 @@ class IRepository(Generic[T]):
     
     def get_all(self) -> List[T]:
         raise NotImplementedError
+    
+    def remove(self, entity_id: int) -> None:
+        raise NotImplementedError
+    

@@ -1,26 +1,28 @@
-from typing import List, Dict
-from datetime import datetime
-from Domain.Entities import Operation
-from Services.Facades.analytics_strategies import BalanceDifferenceStrategy, CategoryGroupingStrategy
-from .analytics_strategy import IAnalyticsStrategy
-from Services.Repositories.repository import IRepository
+from typing import List, Optional
+from Domain.Entities.BankAccount import BankAccount
+from Services.Repositories.IRepository import IRepository
 
-class AnalyticsFacade:
-    def __init__(self, operation_repo: IRepository[Operation]):
-        self._repo = operation_repo
-        self._strategies = {
-            "balance": BalanceDifferenceStrategy(),
-            "categories": CategoryGroupingStrategy()
-        }
+class AccountFacade:
+    def __init__(self, repository: IRepository[BankAccount]):
+        self._repo = repository
 
-    def perform_analysis(self, analysis_type: str, 
-                        start_date: datetime = None,
-                        end_date: datetime = None) -> Dict[str, float]:
-        operations = self._repo.get_all()
-        strategy = self._strategies.get(analysis_type)
-        if not strategy:
-            raise ValueError(f"Unknown analysis type: {analysis_type}")
-        return strategy.analyze(operations, start_date, end_date)
+    def create_account(self, account_id: int, name: str, balance: float) -> BankAccount:
+        account = BankAccount(id=account_id, name=name, balance=balance)
+        self._repo.add(account)
+        return account
 
-    def add_strategy(self, name: str, strategy: IAnalyticsStrategy):
-        self._strategies[name] = strategy
+    def get_all_accounts(self) -> List[BankAccount]:
+        return self._repo.get_all()
+
+    def get_account(self, account_id: int) -> Optional[BankAccount]:
+        return self._repo.get(account_id)
+
+    def delete_account(self, account_id: int):
+        self._repo.remove(account_id)
+
+    def delete_account(self, account_id: int):
+        self._repo.remove(account_id)
+
+    def update_account(self, account: BankAccount):
+        self._repo.remove(account.id)
+        self._repo.add(account)

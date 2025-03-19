@@ -12,6 +12,12 @@ class BalanceDifferenceStrategy(IAnalyticsStrategy):
         income = sum(op.amount for op in filtered if op.type == TransactionType.INCOME)
         expense = sum(op.amount for op in filtered if op.type == TransactionType.EXPENSE)
         return {"income": income, "expense": expense, "difference": income - expense}
+    
+    @staticmethod
+    def _filter_by_date(ops: List[Operation], start: datetime, end: datetime):
+        if not start and not end:
+            return ops
+        return [op for op in ops if (not start or op.date >= start) and (not end or op.date <= end)]
 
 class CategoryGroupingStrategy(IAnalyticsStrategy):
     def analyze(self, operations: List[Operation], start_date: datetime = None,

@@ -1,5 +1,5 @@
 from Domain.interfaces.command import ICommand
-from Services.Facades.account_facade import AccountFacade
+from Services.Facades.analytics_facade import AccountFacade
 
 class CreateAccountCommand(ICommand):
     def __init__(self, facade: AccountFacade, account_id: int, name: str, balance: float):
