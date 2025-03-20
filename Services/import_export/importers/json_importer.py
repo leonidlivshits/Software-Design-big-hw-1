@@ -21,8 +21,6 @@ class JsonImporter:
                 return self._import_accounts(data)
             elif entity_type == "operations":
                 return self._import_operations(data)
-            elif entity_type == "categories":
-                return self._import_categories(data)
             else:
                 raise ValueError("Неизвестный тип сущности")
 

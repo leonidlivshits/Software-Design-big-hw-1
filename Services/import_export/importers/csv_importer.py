@@ -7,8 +7,6 @@ from Domain.Entities.Category import Category
 from Domain.Entities.Operation import Operation
 from Domain.enums import TransactionType
 
-
-
 class CsvImporter:
     def __init__(self, account_facade, operation_facade):
         self.account_facade = account_facade
@@ -24,8 +22,6 @@ class CsvImporter:
                     return self._import_accounts(rows)
                 elif entity_type == "operations":
                     return self._import_operations(rows)
-                elif entity_type == "categories":
-                    return self._import_categories(rows)
                 else:
                     raise ValueError("Неизвестный тип сущности")
         except Exception as e:
