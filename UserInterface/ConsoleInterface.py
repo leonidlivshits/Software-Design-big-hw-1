@@ -4,6 +4,8 @@ from Domain.Entities.Operation import Operation
 from Infrastructure.di.container import Container
 from Domain.enums import TransactionType
 
+
+# Получился антипаттерн Длань Господня, всё в одном месте
 class ConsoleInterface:
     def __init__(self, container: Container):
         self.container = container

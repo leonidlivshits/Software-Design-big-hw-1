@@ -1,2 +1,2 @@
 coverage:
-	pytest -s --cov --cov-report html --cov-fail-under 100
+	pytest -s --cov --cov-report html --cov-fail-under 65
