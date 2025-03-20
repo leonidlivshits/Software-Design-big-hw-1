@@ -1,0 +1,2 @@
+id,type,amount,date,bank_account_id,category_id
+1,expense,10.0,2005-09-09,1,1

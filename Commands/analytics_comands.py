@@ -31,16 +31,3 @@ class GenerateCategoryReportCommand(ICommand):
 
     def execute(self):
         return self.facade.get_category_report()
-
-# class GenerateTrendAnalysisCommand(ICommand):
-#     def __init__(self, facade: AnalyticsFacade, months: int):
-#         self.facade = facade
-#         self.end_date = datetime.now()
-#         self.start_date = self.end_date - relativedelta(months=months)
-
-#     def execute(self):
-#         return self.facade.perform_analysis(
-#             "trends", 
-#             self.start_date, 
-#             self.end_date
-#         )

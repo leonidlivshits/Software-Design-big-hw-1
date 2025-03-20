@@ -1,4 +1,3 @@
-# Services/Repositories/in_memory_repository.py
 from typing import Dict, TypeVar, List, Optional
 from Services.Repositories.IRepository import IRepository
 from Domain.interfaces.entity import IEntity
@@ -15,7 +14,7 @@ class InMemoryRepository(IRepository[T]):
     def get(self, entity_id: int) -> Optional[T]:
         return self._storage.get(entity_id)
 
-    def get_all(self) -> List[T]:  # <-- Добавляем реализацию
+    def get_all(self) -> List[T]:
         return list(self._storage.values())
 
     def remove(self, entity_id: int) -> None:

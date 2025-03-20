@@ -1,4 +1,3 @@
-# user_interface/console_interface.py
 from datetime import datetime
 from Domain.Entities.Category import Category
 from Domain.Entities.Operation import Operation
@@ -21,25 +20,28 @@ class ConsoleInterface:
             print("2. Управление операциями") 
             print("3. Аналитика и отчеты")
             print("4. Импорт/экспорт данных")
-            print("5. Управление категориями")  # Новый пункт
+            print("5. Управление категориями")
             print("0. Выход")
-            
-            choice = input("Выберите пункт: ")
-            
-            if choice == "1":
-                self._show_account_menu()
-            elif choice == "2":
-                self._show_operation_menu()
-            elif choice == "3":
-                self._show_analytics_menu()
-            elif choice == "4":
-                self._show_import_export_menu()
-            if choice == "5":
-                self._show_category_menu()
-            elif choice == "0":
-                exit()
-            else:
-                print("Неверный ввод!")
+            try:
+                choice = self._input_int("Выберите пункт: ")
+                
+                if choice == 1:
+                    self._show_account_menu()
+                elif choice == 2:
+                    self._show_operation_menu()
+                elif choice == 3:
+                    self._show_analytics_menu()
+                elif choice == 4:
+                    self._show_import_export_menu()
+                elif choice == 5:
+                    self._show_category_menu()
+                elif choice == 0:
+                    exit()
+                else:
+                    print("Неверный ввод!")
+            except Exception as e:
+                print(f"Ошибка: {str(e)}")
+                continue
 
     def _show_account_menu(self):
         while True:
@@ -49,21 +51,24 @@ class ConsoleInterface:
             print("3. Выбрать текущий счет")
             print("4. Удалить счет")
             print("9. Назад")
-            
-            choice = input("Выберите действие: ")
-            
-            if choice == "1":
-                self._create_account()
-            elif choice == "2":
-                self._list_accounts()
-            elif choice == "3":
-                self._select_account()
-            elif choice == "4":
-                self._delete_account()
-            elif choice == "9":
-                return
-            else:
-                print("Неверный ввод!")
+            try:
+                choice = self._input_int("Выберите действие: ")
+                
+                if choice == 1:
+                    self._create_account()
+                elif choice == 2:
+                    self._list_accounts()
+                elif choice == 3:
+                    self._select_account()
+                elif choice == 4:
+                    self._delete_account()
+                elif choice == 9:
+                    return
+                else:
+                    print("Неверный ввод!")
+            except Exception as e:
+                print(f"Ошибка: {str(e)}")
+                continue
     
     def _show_category_menu(self):
         while True:
@@ -71,24 +76,33 @@ class ConsoleInterface:
             print("1. Создать категорию")
             print("2. Просмотреть все категории")
             print("9. Назад")
-            choice = input("Выберите действие: ")
-            if choice == "1":
+            choice = self._input_int("Выберите действие: ")
+            if choice == 1:
                 self._create_category()
-            elif choice == "2":
+            elif choice == 2:
                 self._list_categories()
-            elif choice == "9":
+            elif choice == 9:
                 return
 
     def _create_account(self):
         try:
-            account_id = int(input("Введите ID счета: "))
+            account_id = self._input_int("Введите ID счета: ")
             name = input("Введите название счета: ")
-            balance = float(input("Введите начальный баланс: "))
+            balance = self._input_float("Введите начальный баланс: ")
             
             facade = self.container.get_account_facade()
             account = facade.create_account(account_id, name, balance)
             print(f"Счет {account.name} создан!")
             
+        except Exception as e:
+            print(f"Ошибка: {str(e)}")
+
+    def _delete_account(self):
+        try:
+            self._list_accounts()
+            account_id = self._input_int("Введите ID аккаунта для удаления: ")
+            self.container.account_facade.delete_account(account_id)
+            print("Аккаунт удалён!")
         except Exception as e:
             print(f"Ошибка: {str(e)}")
 
@@ -106,7 +120,7 @@ class ConsoleInterface:
     def _select_account(self):
         self._list_accounts()
         try:
-            account_id = int(input("Введите ID счета: "))
+            account_id = self._input_int("Введите ID счета: ")
             facade = self.container.get_account_facade()
             account = facade.get_account(account_id)
             
@@ -125,22 +139,17 @@ class ConsoleInterface:
             return
 
         try:
-            operation_id = int(input("Введите ID операции: "))
-            amount = float(input("Сумма: "))
-            type_choice = input("Тип (1 - доход, 2 - расход): ")
-            category_id = int(input("ID категории: "))
-            date_str = input("Дата (ГГГГ-ММ-ДД): ")
-
+            operation_id = self._input_int("Введите ID операции: ")
+            amount = self._input_float("Сумма: ")
+            type_choice = self._input_int("Тип (1 - доход, 2 - расход): ")
+            if type_choice not in (1, 2):
+                raise ValueError("Неверный тип операции")
+            self._list_categories()
+            category_id = self._input_int("ID категории: ")
             if not self.container.category_facade.get_category(category_id):
                 print("Ошибка: Категория не найдена!")
                 return
-
-            if type_choice not in ("1", "2"):
-                raise ValueError("Неверный тип операции")
-            
-            
-            
-            date = datetime.strptime(date_str, "%Y-%m-%d")
+            date = self._input_date("Дата (ГГГГ-ММ-ДД): ")
             
             op_type = TransactionType.INCOME if type_choice == "1" else TransactionType.EXPENSE
 
@@ -163,15 +172,14 @@ class ConsoleInterface:
 
     def _delete_operation(self):
         try:
-            operation_id = int(input("Введите ID операции для удаления: "))
+            self._list_operations()
+            operation_id = self._input_int("Введите ID операции для удаления: ")
             self.container.operation_facade.delete_operation(operation_id)
             print("Операция удалена!")
         except Exception as e:
             print(f"Ошибка: {str(e)}")
     
-    def _show_operation_menu(self):
-        # Реализация меню операций
-        pass
+    
         
     def _show_analytics_menu(self):
         while True:
@@ -180,44 +188,26 @@ class ConsoleInterface:
             print("2. Расходы по категориям")
             print("9. Назад")
             
-            choice = input("Выберите отчет: ")
+            choice = self._input_int("Выберите отчет: ")
             
-            if choice == "1":
+            if choice == 1:
                 self._show_balance_report()
-            elif choice == "2":
+            elif choice == 2:
                 self._show_category_report()
-            elif choice == "9":
+            elif choice == 9:
                 return
             else:
                 print("Неверный ввод!")
 
     def _show_balance_report(self):
-        # try:
-        #     start = input("Начальная дата (ГГГГ-ММ-ДД): ")
-        #     end = input("Конечная дата (ГГГГ-ММ-ДД): ")
-            
-        #     start_date = datetime.strptime(start, "%Y-%m-%d") if start else None
-        #     end_date = datetime.strptime(end, "%Y-%m-%d") if end else None
-            
-        #     report = self.container.analytics_facade.get_balance_report(
-        #         start_date, 
-        #         end_date
-        #     )
-            
-        #     print(f"\nДоходы: {report['income']:.2f}")
-        #     print(f"Расходы: {report['expense']:.2f}")
-        #     print(f"Баланс: {report['difference']:.2f}")
 
         try:
-            start = input("Начальная дата (ГГГГ-ММ-ДД): ")
-            end = input("Конечная дата (ГГГГ-ММ-ДД): ")
-            
-            start_date = datetime.strptime(start, "%Y-%m-%d")
-            end_date = datetime.strptime(end, "%Y-%m-%d")
+            start = self._input_date("Начальная дата (ГГГГ-ММ-ДД): ")
+            end = self._input_date("Конечная дата (ГГГГ-ММ-ДД): ")
             
             report = self.container.analytics_facade.get_balance_report(
-                start_date, 
-                end_date
+                start, 
+                end
             )
             
             print(f"\nОтчет за период {start} - {end}:")
@@ -227,10 +217,7 @@ class ConsoleInterface:
             
         except Exception as e:
             print(f"Ошибка: {str(e)}")
-        
-    def _show_import_export_menu(self):
-        # Реализация меню импорта/экспорта
-        pass
+
 
     def _show_operation_menu(self):
         while True:
@@ -240,15 +227,15 @@ class ConsoleInterface:
             print("3. Удалить операцию")
             print("9. Назад")
             
-            choice = input("Выберите действие: ")
+            choice = self._input_int("Выберите действие: ")
             
-            if choice == "1":
+            if choice == 1:
                 self._create_operation()
-            elif choice == "2":
+            elif choice == 2:
                 self._list_operations()
-            elif choice == "3":
+            elif choice == 3:
                 self._delete_operation()
-            elif choice == "9":
+            elif choice == 9:
                 return
             else:
                 print("Неверный ввод!")
@@ -274,7 +261,7 @@ class ConsoleInterface:
 
     def _delete_operation(self):
         try:
-            operation_id = int(input("Введите ID операции для удаления: "))
+            operation_id = self._input_int("Введите ID операции для удаления: ")
             facade = self.container.get_operation_facade()
             facade.delete_operation(operation_id)
             print("Операция удалена!")
@@ -314,7 +301,7 @@ class ConsoleInterface:
                 print(f"Экспортировано {len(accounts)} счетов")
                 
             elif entity_choice == "operations":
-                operations = self.container.get_operation_facade().get_all_operations()
+                operations = self.container.get_operation_facade().get_operations_by_account(self.current_account_id)
                 for op in operations:
                     exporter.visit_operation(op)
                 print(f"Экспортировано {len(operations)} операций")
@@ -325,15 +312,18 @@ class ConsoleInterface:
         except Exception as e:
             print(f"Ошибка экспорта: {str(e)}")
 
+
     def _import_data(self):
         try:
             format_choice = input("Формат (csv/json): ").lower()
+            entity_choice = input("Тип (accounts/operations): ").lower()
             file_path = input("Путь к файлу: ")
             
             importer = self.container.get_importer(format_choice)
-            result = importer.import_data(file_path)
+            count = importer.import_data(file_path, entity_choice)
             
-            print(f"Импортировано {len(result)} записей")
+            print(f"Успешно импортировано {count} записей")
+            print("Проверьте обновленные данные в соответствующих меню")
             
         except Exception as e:
             print(f"Ошибка импорта: {str(e)}")
@@ -355,20 +345,20 @@ class ConsoleInterface:
             print("1. Создать категорию")
             print("2. Список категорий")
             print("9. Назад")
-            choice = input("Выберите действие: ")
+            choice = self._input_int("Выберите действие: ")
             
-            if choice == "1":
+            if choice == 1:
                 self._create_category()
-            elif choice == "2":
+            elif choice == 2:
                 self._list_categories()
-            elif choice == "9":
+            elif choice == 9:
                 return
             else:
                 print("Неверный ввод!")
 
     def _create_category(self):
         try:
-            category_id = int(input("Введите ID категории: "))
+            category_id = self._input_int("Введите ID категории: ")
             name = input("Введите название категории: ")
             type_choice = input("Тип (1 - доход, 2 - расход): ")
             
@@ -396,5 +386,29 @@ class ConsoleInterface:
                 
         except Exception as e:
             print(f"Ошибка: {str(e)}")
+
+    def _safe_input(self, prompt: str, validator=None):
+        while True:
+            try:
+                value = input(prompt)
+                if validator:
+                    return validator(value)
+                return value
+            except (KeyboardInterrupt, EOFError):
+                print("\nОперация отменена. Возврат в меню.")
+                raise
+            except Exception as e:
+                print(f"Ошибка: {str(e)}. Попробуйте снова.")
+
+    def _input_int(self, prompt: str) -> int:
+        return int(self._safe_input(prompt, lambda x: int(x)))
+
+    def _input_float(self, prompt: str) -> float:
+        return float(self._safe_input(prompt, lambda x: float(x)))
+
+    def _input_date(self, prompt: str) -> datetime:
+        def validate_date(date_str):
+            return datetime.strptime(date_str, "%Y-%m-%d")
+        return self._safe_input(prompt, validate_date)
 
     
