@@ -1,2 +1,2 @@
-class DomainException(Exception):
+class DomainException(Exception): 
     pass

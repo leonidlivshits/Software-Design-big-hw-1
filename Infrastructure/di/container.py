@@ -17,7 +17,7 @@ from Services.import_export.exporters.json_visitor import JsonExportVisitor
 from Services.import_export.importers.csv_importer import CsvImporter
 from Services.import_export.importers.json_importer import JsonImporter
 
-
+# DI-контейнер
 class Container:
     def __init__(self):
         # Репозитории

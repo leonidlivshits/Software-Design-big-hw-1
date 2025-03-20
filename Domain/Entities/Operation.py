@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 from Domain.enums.transaction_type import TransactionType
 from Domain.exceptions import DomainException
+from Domain.interfaces.entity import IEntity
 
 @dataclass
 class Operation:
